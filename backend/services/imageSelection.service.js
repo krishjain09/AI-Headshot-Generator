@@ -16,24 +16,24 @@ async function selectBestImages(images) {
   if (!images || images.length === 0) return [];
 
   // Score each image: lower is better (closer to square aspect ratio)
-  const scored = images.map((img) => {
-    const ratio = img.width && img.height ? img.width / img.height : 1;
-    const squareness = Math.abs(ratio - 1); // 0 = perfect square
-    return { ...img, squareness };
-  });
+  // const scored = images.map((img) => {
+  //   const ratio = img.width && img.height ? img.width / img.height : 1;
+  //   const squareness = Math.abs(ratio - 1); // 0 = perfect square
+  //   return { ...img, squareness };
+  // });
 
-  // Sort by squareness ascending, take top 3
-  const sorted = scored
-    .sort((a, b) => a.squareness - b.squareness)
-    .slice(0, 3);
+  // // Sort by squareness ascending, take top 3
+  // const sorted = scored
+  //   .sort((a, b) => a.squareness - b.squareness)
+  //   .slice(0, 3);
 
-  logger.info(
-    `Selected ${sorted.length} best reference image(s): ${sorted
-      .map((i) => i.publicId)
-      .join(", ")}`
-  );
+  // logger.info(
+  //   `Selected ${sorted.length} best reference image(s): ${sorted
+  //     .map((i) => i.publicId)
+  //     .join(", ")}`
+  // );
 
-  return sorted.map(({ squareness, ...img }) => img);
+  return images;
 }
 
 module.exports = { selectBestImages };

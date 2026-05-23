@@ -1,21 +1,22 @@
-const {
-  runFluxPro,
-  runInstantID,
-  PROMPT_TEMPLATES,
-} = require("./replicate.service");
+const { runPuLID, PROMPT_TEMPLATES } = require("./replicate.service");
 
 const { uploadUrlToCloudinary } = require("./cloudinary.service");
 const { sessionStore } = require("../utils/sessionStore");
 const { logger } = require("../utils/logger");
 
 /**
- * Core AI generation pipeline.
+ * AI HEADSHOT GENERATION PIPELINE
  *
- * Strategy:
- * 1. Use InstantID with the best face reference image
- * 2. Use FLUX Pro for premium generations
- * 3. Store generated images in Cloudinary
- 
+ * FLOW:
+ * Upload Photos
+ *      ↓
+ * Choose Best Face
+ *      ↓
+ * PuLID Identity Preservation
+ *      ↓
+ * Generate LinkedIn Headshots
+ *      ↓
+ * Save To Cloudinary
  */
 
 async function delay(ms) {
@@ -27,114 +28,130 @@ async function runGenerationPipeline(
   bestImages,
   style = "corporate",
 ) {
-  logger.info(`[Pipeline] Starting for session ${sessionId}, style: ${style}`);
+  logger.info(`[Pipeline] Starting session ${sessionId}`);
+
+  // ============================================================
+  // GET PROMPTS
+  // ============================================================
 
   const prompts = PROMPT_TEMPLATES[style] || PROMPT_TEMPLATES.corporate;
 
+  // ============================================================
+  // BEST FACE IMAGE
+  // ============================================================
+  console.log(bestImages);
   const primaryFaceUrl = bestImages[0]?.url;
+
+  if (!primaryFaceUrl) {
+    throw new Error("No valid face image found");
+  }
+
+  logger.info(`[Pipeline] Using face: ${primaryFaceUrl}`);
 
   const generatedImages = [];
 
-  // ─────────────────────────────────────────────────────────────
-  // Phase 1: InstantID
-  // ─────────────────────────────────────────────────────────────
+  // ============================================================
+  // GENERATE 3 HEADSHOTS
+  // ============================================================
 
-  // if (primaryFaceUrl) {
-  //   logger.info(`[Pipeline] Phase 1: InstantID with ${primaryFaceUrl}`);
+  const selectedPrompts = prompts.slice(0, 6);
 
-  //   const instantIdPrompts = prompts.slice(0, 3);
-  //   console.log(instantIdPrompts.entries());
-  //   for (const [i, prompt] of instantIdPrompts.entries()) {
-  //     try {
-  //       logger.info(`[Pipeline] InstantID generation ${i + 1}/3`);
-
-  //       const outputUrl = await runInstantID({
-  //         faceImageUrl: primaryFaceUrl,
-  //         prompt: `${prompt}, (same person:1.4), detailed face, high quality`,
-  //       });
-
-  //       const cloudResult = await uploadUrlToCloudinary(outputUrl, {
-  //         folder: `headshots/generated/${sessionId}`,
-  //         public_id: `${sessionId}_instantid_${i}`,
-  //         overwrite: true,
-  //       });
-
-  //       const generated = {
-  //         url: cloudResult.secure_url,
-  //         publicId: cloudResult.public_id,
-  //         model: "InstantID",
-  //         prompt: prompt.slice(0, 80),
-  //         index: generatedImages.length,
-  //       };
-
-  //       generatedImages.push(generated);
-
-  //       sessionStore.update(sessionId, {
-  //         generatedImages: [...generatedImages],
-  //       });
-
-  //       logger.info(`[Pipeline] InstantID ${i + 1} completed`);
-
-  //       // VERY IMPORTANT FOR FREE-TIER RATE LIMITS
-  //       await delay(60000);
-  //     } catch (err) {
-  //       logger.warn(`[Pipeline] InstantID prompt ${i} failed: ${err.message}`);
-  //     }
-  //   }
-  // }
-
-  // ─────────────────────────────────────────────────────────────
-  // Phase 2: FLUX Pro
-  // ─────────────────────────────────────────────────────────────
-
-  logger.info(`[Pipeline] Phase 2: FLUX Pro`);
-
-  const fluxPrompts = prompts
-    .slice(0, 3)
-    .map((p) => `${p}, professional photo, shot on Canon R5, 85mm lens, f/2.8`);
-
-  for (const [i, prompt] of fluxPrompts.entries()) {
+  for (const [i, basePrompt] of selectedPrompts.entries()) {
     try {
-      logger.info(`[Pipeline] FLUX generation ${i + 1}/3`);
+      logger.info(`[Pipeline] Generation ${i + 1}/6`);
 
-      const outputUrl = await runFluxPro({ prompt });
+      // ============================================================
+      // FINAL PROMPT
+      // ============================================================
 
-      const cloudResult = await uploadUrlToCloudinary(outputUrl, {
+      const finalPrompt = `
+          professional linkedin corporate headshot,
+          same person as reference image,
+          male,
+          business suit,
+          realistic face,
+          office background,
+          professional photography,
+          natural skin texture,
+          sharp focus,
+          high quality,
+          ${basePrompt}
+          `;
+
+      // ============================================================
+      // RUN PULID
+      // ============================================================
+
+      const outputUrl = await runPuLID({
+        faceImageUrl: primaryFaceUrl,
+        prompt: finalPrompt,
+      });
+
+      logger.info(`[Pipeline] PuLID output received`);
+
+      console.log(outputUrl.href);
+      console.log(typeof outputUrl);
+      // ============================================================
+      // MOST PULID MODELS RETURN ARRAY
+      // ============================================================
+
+      // ============================================================
+      // UPLOAD TO CLOUDINARY
+      // ============================================================
+
+      logger.info(`[Pipeline] Uploading to Cloudinary`);
+
+      const cloudResult = await uploadUrlToCloudinary(outputUrl.href, {
         folder: `headshots/generated/${sessionId}`,
-        public_id: `${sessionId}_flux_${i}`,
+        public_id: `${sessionId}_pulid_${i}`,
         overwrite: true,
       });
+
+      // ============================================================
+      // GENERATED IMAGE OBJECT
+      // ============================================================
 
       const generated = {
         url: cloudResult.secure_url,
         publicId: cloudResult.public_id,
-        model: "FLUX Pro",
-        prompt: prompt.slice(0, 80),
+        model: "PuLID",
+        prompt: basePrompt,
         index: generatedImages.length,
       };
 
       generatedImages.push(generated);
 
+      // ============================================================
+      // LIVE SESSION UPDATE
+      // ============================================================
+
       sessionStore.update(sessionId, {
         generatedImages: [...generatedImages],
       });
 
-      logger.info(`[Pipeline] FLUX ${i + 1} completed`);
+      logger.info(`[Pipeline] Generation ${i + 1} completed`);
 
-      // VERY IMPORTANT FOR FREE-TIER RATE LIMITS
-      await delay(20000);
+      // ============================================================
+      // RATE LIMIT SAFETY
+      // ============================================================
+
+      await delay(15000);
     } catch (err) {
-      logger.warn(`[Pipeline] FLUX prompt ${i} failed: ${err.message}`);
+      logger.error(`[Pipeline] Generation ${i + 1} failed: ${err.message}`);
     }
   }
 
-  // ─────────────────────────────────────────────────────────────
-  // Finalize
-  // ─────────────────────────────────────────────────────────────
+  // ============================================================
+  // FINAL VALIDATION
+  // ============================================================
 
   if (generatedImages.length === 0) {
-    throw new Error("All generation attempts failed. Please try again.");
+    throw new Error("All generations failed");
   }
+
+  // ============================================================
+  // COMPLETE SESSION
+  // ============================================================
 
   sessionStore.update(sessionId, {
     status: "completed",
@@ -142,7 +159,7 @@ async function runGenerationPipeline(
   });
 
   logger.info(
-    `[Pipeline] Completed session ${sessionId}: ${generatedImages.length} images generated`,
+    `[Pipeline] Completed session ${sessionId} with ${generatedImages.length} images`,
   );
 
   return generatedImages;
