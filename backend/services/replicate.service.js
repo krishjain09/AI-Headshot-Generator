@@ -60,8 +60,7 @@ const PROMPT_TEMPLATES = {
 };
 
 const NEGATIVE_PROMPT =
-  "cartoon, illustration, painting, drawing, art, animated, deformed, blurry, bad anatomy, bad face, mutation, extra limbs, watermark, text, logo, signature, low quality, pixelated, grainy, overexposed, underexposed";
-
+  "blurry, out of focus, soft focus, motion blur, bokeh on face, hazy, foggy, low resolution, pixelated, grainy, noisy, jpeg artifacts, overexposed, underexposed, washed out, cartoon, illustration, painting, drawing, anime, CGI, 3D render, plastic skin, waxy skin, doll face, mask-like, deformed face, asymmetrical face, bad eyes, crossed eyes, extra limbs, bad anatomy, mutation, watermark, text, logo, signature, timestamp, border, frame, multiple people, duplicate face";
 /**
  * Run a single prediction using FLUX Pro (text-to-image, high quality).
  * Best for: clean headshots with custom backgrounds.
@@ -110,28 +109,32 @@ async function runPuLID({ faceImageUrl, prompt }) {
 
       prompt,
 
+      // ✅ ADD negative prompt
+      negative_prompt: NEGATIVE_PROMPT,
+
       width: 1024,
       height: 1024,
 
-      num_inference_steps: 28,
+      // ✅ More steps = sharper, more detailed output
+      num_inference_steps: 35,
 
-      guidance_scale: 2.5,
+      // ✅ Higher guidance = stronger prompt adherence
+      guidance_scale: 7.0,
 
-      true_cfg_scale: 1,
+      // ✅ true_cfg balances realism vs prompt
+      true_cfg_scale: 1.5,
 
-      id_weight: 1.3,
+      // ✅ Lower id_weight = less face distortion, still preserves identity
+      id_weight: 0.9,
 
-      max_sequence_length: 128,
+      // ✅ Full prompt length — your prompts are long!
+      max_sequence_length: 256,
     },
   });
 
-  console.log(output);
-
-  // Most PuLID models return array of URLs
   const fileOutput = Array.isArray(output) ? output[0] : output;
   const url = fileOutput.url();
   logger.info(`PuLID output: ${url}`);
-
   return url;
 }
 

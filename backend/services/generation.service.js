@@ -60,44 +60,22 @@ async function runGenerationPipeline(
     try {
       logger.info(`[Pipeline] Generation ${i + 1}/6`);
 
-      // ============================================================
-      // FINAL PROMPT
-      // ============================================================
-
-      const finalPrompt = `
-          professional linkedin corporate headshot,
-          same person as reference image,
-          male,
-          business suit,
-          realistic face,
-          office background,
-          professional photography,
-          natural skin texture,
-          sharp focus,
-          high quality,
-          ${basePrompt}
-          `;
-
-      // ============================================================
+      
       // RUN PULID
-      // ============================================================
+      
 
       const outputUrl = await runPuLID({
-        faceImageUrl: primaryFaceUrl,
-        prompt: finalPrompt,
-      });
+      faceImageUrl: primaryFaceUrl,
+      prompt: basePrompt,   // ← clean, no prefix pollution
+    });
 
       logger.info(`[Pipeline] PuLID output received`);
 
       console.log(outputUrl.href);
       console.log(typeof outputUrl);
-      // ============================================================
-      // MOST PULID MODELS RETURN ARRAY
-      // ============================================================
-
-      // ============================================================
+      
       // UPLOAD TO CLOUDINARY
-      // ============================================================
+     
 
       logger.info(`[Pipeline] Uploading to Cloudinary`);
 
@@ -107,9 +85,9 @@ async function runGenerationPipeline(
         overwrite: true,
       });
 
-      // ============================================================
+      
       // GENERATED IMAGE OBJECT
-      // ============================================================
+  
 
       const generated = {
         url: cloudResult.secure_url,
@@ -121,9 +99,9 @@ async function runGenerationPipeline(
 
       generatedImages.push(generated);
 
-      // ============================================================
+     
       // LIVE SESSION UPDATE
-      // ============================================================
+      
 
       sessionStore.update(sessionId, {
         generatedImages: [...generatedImages],
