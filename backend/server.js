@@ -6,6 +6,7 @@ const fs = require("fs");
 
 const uploadRoutes = require("./routes/upload.routes");
 const generateRoutes = require("./routes/generate.routes");
+const unlockRoutes = require("./routes/unlock.routes");
 const resultsRoutes = require("./routes/results.routes");
 
 const { errorHandler } = require("./utils/errorHandler");
@@ -40,7 +41,7 @@ app.use((req, _res, next) => {
 app.use("/api/upload", uploadRoutes);
 app.use("/api/generate", generateRoutes);
 app.use("/api/results", resultsRoutes);
-
+app.use("/api/unlock", unlockRoutes);
 
 
 // ─── Error Handler 

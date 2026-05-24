@@ -16,16 +16,56 @@ cloudinary.config({
  * @param {object} options  – Cloudinary upload options
  * @returns Cloudinary upload result
  */
-async function uploadToCloudinary(filePath, options = {}) {
+async function uploadToCloudinary(file, options = {}) {
   try {
-    const result = await cloudinary.uploader.upload(filePath, {
+    // ============================================================
+    // BUFFER UPLOAD
+    // ============================================================
+
+    if (Buffer.isBuffer(file)) {
+      return await new Promise((resolve, reject) => {
+        const stream = cloudinary.uploader.upload_stream(
+          {
+            resource_type: "image",
+
+            ...options,
+          },
+
+          (err, result) => {
+            if (err) {
+              logger.error(`Cloudinary buffer upload failed: ${err.message}`);
+
+              return reject(
+                new Error(`Cloudinary upload failed: ${err.message}`),
+              );
+            }
+
+            logger.info(`Cloudinary upload OK: ${result.public_id}`);
+
+            resolve(result);
+          },
+        );
+
+        stream.end(file);
+      });
+    }
+
+    // ============================================================
+    // FILE PATH UPLOAD
+    // ============================================================
+
+    const result = await cloudinary.uploader.upload(file, {
       resource_type: "image",
+
       ...options,
     });
+
     logger.info(`Cloudinary upload OK: ${result.public_id}`);
+
     return result;
   } catch (err) {
-    logger.error(`Cloudinary upload failed for ${filePath}: ${err.message}`);
+    logger.error(`Cloudinary upload failed: ${err.message}`);
+
     throw new Error(`Cloudinary upload failed: ${err.message}`);
   }
 }

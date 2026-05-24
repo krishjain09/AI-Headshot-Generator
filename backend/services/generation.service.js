@@ -1,23 +1,17 @@
+const axios = require("axios");
+
 const { runPuLID, PROMPT_TEMPLATES } = require("./replicate.service");
 
-const { uploadUrlToCloudinary } = require("./cloudinary.service");
-const { sessionStore } = require("../utils/sessionStore");
-const { logger } = require("../utils/logger");
+const {
+  uploadUrlToCloudinary,
+  uploadToCloudinary,
+} = require("./cloudinary.service");
 
-/**
- * AI HEADSHOT GENERATION PIPELINE
- *
- * FLOW:
- * Upload Photos
- *      ↓
- * Choose Best Face
- *      ↓
- * PuLID Identity Preservation
- *      ↓
- * Generate LinkedIn Headshots
- *      ↓
- * Save To Cloudinary
- */
+const { applyCornerBadge } = require("../utils/watermark");
+
+const { sessionStore } = require("../utils/sessionStore");
+
+const { logger } = require("../utils/logger");
 
 async function delay(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
@@ -30,16 +24,8 @@ async function runGenerationPipeline(
 ) {
   logger.info(`[Pipeline] Starting session ${sessionId}`);
 
-  // ============================================================
-  // GET PROMPTS
-  // ============================================================
-
   const prompts = PROMPT_TEMPLATES[style] || PROMPT_TEMPLATES.corporate;
 
-  // ============================================================
-  // BEST FACE IMAGE
-  // ============================================================
-  console.log(bestImages);
   const primaryFaceUrl = bestImages[0]?.url;
 
   if (!primaryFaceUrl) {
@@ -50,68 +36,99 @@ async function runGenerationPipeline(
 
   const generatedImages = [];
 
-  // ============================================================
-  // GENERATE 3 HEADSHOTS
-  // ============================================================
-
-  const selectedPrompts = prompts.slice(0, 6);
+  const selectedPrompts = prompts.slice(0, 3);
 
   for (const [i, basePrompt] of selectedPrompts.entries()) {
     try {
-      logger.info(`[Pipeline] Generation ${i + 1}/6`);
+      logger.info(`[Pipeline] Generation ${i + 1}/3`);
 
-      
+      // ============================================================
       // RUN PULID
-      
+      // ============================================================
 
       const outputUrl = await runPuLID({
-      faceImageUrl: primaryFaceUrl,
-      prompt: basePrompt,   // ← clean, no prefix pollution
-    });
+        faceImageUrl: primaryFaceUrl,
+
+        prompt: basePrompt,
+      });
 
       logger.info(`[Pipeline] PuLID output received`);
 
-      console.log(outputUrl.href);
-      console.log(typeof outputUrl);
-      
-      // UPLOAD TO CLOUDINARY
-     
+      // ============================================================
+      // DOWNLOAD GENERATED IMAGE
+      // ============================================================
 
-      logger.info(`[Pipeline] Uploading to Cloudinary`);
+      const response = await axios.get(outputUrl.href, {
+        responseType: "arraybuffer",
+      });
 
-      const cloudResult = await uploadUrlToCloudinary(outputUrl.href, {
-        folder: `headshots/generated/${sessionId}`,
-        public_id: `${sessionId}_pulid_${i}`,
+      const originalBuffer = Buffer.from(response.data);
+
+      // ============================================================
+      // APPLY WATERMARK
+      // ============================================================
+
+      const previewBuffer = await applyCornerBadge(originalBuffer);
+
+      // ============================================================
+      // SAVE ORIGINAL IMAGE
+      // ============================================================
+
+      logger.info(`[Pipeline] Uploading original image`);
+
+      const originalUpload = await uploadToCloudinary(originalBuffer, {
+        folder: `headshots/generated/original/${sessionId}`,
+
+        public_id: `${sessionId}_original_${i}`,
+
         overwrite: true,
       });
 
-      
-      // GENERATED IMAGE OBJECT
-  
+      // ============================================================
+      // SAVE WATERMARK PREVIEW
+      // ============================================================
+
+      logger.info(`[Pipeline] Uploading preview image`);
+
+      const previewUpload = await uploadToCloudinary(previewBuffer, {
+        folder: `headshots/generated/preview/${sessionId}`,
+
+        public_id: `${sessionId}_preview_${i}`,
+
+        overwrite: true,
+      });
+
+      // ============================================================
+      // GENERATED OBJECT
+      // ============================================================
 
       const generated = {
-        url: cloudResult.secure_url,
-        publicId: cloudResult.public_id,
+        previewUrl: previewUpload.secure_url,
+
+        originalUrl: originalUpload.secure_url,
+
+        previewPublicId: previewUpload.public_id,
+
+        originalPublicId: originalUpload.public_id,
+
         model: "PuLID",
+
         prompt: basePrompt,
+
         index: generatedImages.length,
       };
 
       generatedImages.push(generated);
 
-     
+      // ============================================================
       // LIVE SESSION UPDATE
-      
+      // ============================================================
 
       sessionStore.update(sessionId, {
-        generatedImages: [...generatedImages],
+        generatedImages,
       });
 
       logger.info(`[Pipeline] Generation ${i + 1} completed`);
-
-      // ============================================================
-      // RATE LIMIT SAFETY
-      // ============================================================
 
       await delay(15000);
     } catch (err) {
@@ -119,20 +136,13 @@ async function runGenerationPipeline(
     }
   }
 
-  // ============================================================
-  // FINAL VALIDATION
-  // ============================================================
-
   if (generatedImages.length === 0) {
     throw new Error("All generations failed");
   }
 
-  // ============================================================
-  // COMPLETE SESSION
-  // ============================================================
-
   sessionStore.update(sessionId, {
     status: "completed",
+
     generatedImages,
   });
 
