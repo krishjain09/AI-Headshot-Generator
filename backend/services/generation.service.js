@@ -36,11 +36,11 @@ async function runGenerationPipeline(
 
   const generatedImages = [];
 
-  const selectedPrompts = prompts.slice(0, 3);
+  const selectedPrompts = prompts.slice(0, 6);
 
   for (const [i, basePrompt] of selectedPrompts.entries()) {
     try {
-      logger.info(`[Pipeline] Generation ${i + 1}/3`);
+      logger.info(`[Pipeline] Generation ${i + 1}/6`);
 
       // ============================================================
       // RUN PULID
