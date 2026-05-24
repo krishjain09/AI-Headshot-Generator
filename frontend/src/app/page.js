@@ -429,7 +429,7 @@ export default function Home() {
             </div>
 
             {/* PROGRESS */}
-            <div className="hs-progress-section">
+            <div className="-section">
               <div className="hs-progress-head">
                 <span>Generation Progress</span>
 
