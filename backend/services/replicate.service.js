@@ -17,45 +17,45 @@ const PULID_MODEL =
 // ─── Prompt templates ─────────────────────────────────────────────────────────
 const PROMPT_TEMPLATES = {
   corporate: [
-    "photorealistic linkedin headshot of the same person from reference images, navy blue tailored suit with subtle texture, crisp white dress shirt, soft diffused office lighting, shallow depth of field with blurred modern glass office background, direct confident eye contact, natural pore-level skin texture, shot on Sony A7R V with 85mm f/1.4 lens, professional neutral expression, color graded warm-neutral tones",
+    "professional linkedin headshot, navy blue business suit, white dress shirt, modern corporate office background, soft studio lighting, shallow depth of field, realistic skin texture, premium corporate photography, ultra realistic",
 
-    "photorealistic corporate executive portrait of the same person from reference images, seated at a sleek modern office desk, natural window light from left side creating soft shadows, ultra realistic facial features preserved, calm authoritative expression, business formal attire, premium linkedin profile quality, shot on Phase One medium format camera",
+    "corporate executive portrait, charcoal tailored suit, luxury office interior, natural window lighting, clean professional look, realistic facial details, linkedin profile photo, ultra realistic",
 
-    "photorealistic business professional portrait of the same person from reference images, standing near floor-to-ceiling glass office wall, luxury high-rise corporate environment visible through glass, cinematic depth of field, ultra sharp facial details, realistic skin tones, natural stance, shot on Canon R5 with 85mm lens, editorial magazine quality",
+    "business professional headshot, formal dark suit, blurred glass office background, soft diffused lighting, confident expression, realistic skin texture, premium business photography",
 
-    "photorealistic linkedin headshot of the same person from reference images, arms crossed confident pose, dark charcoal tailored suit, elegant soft-lit office background, studio-quality lighting with gentle rim light, natural facial proportions fully preserved, realistic skin texture with micro detail, premium corporate headshot quality",
+    "professional office portrait, dark navy suit and tie, elegant modern workspace background, cinematic soft lighting, sharp facial focus, realistic portrait photography, linkedin style",
 
-    "photorealistic smiling office portrait of the same person from reference images, warm approachable expression, modern open-plan workspace bokeh background, business formal attire, even soft lighting, true-to-life face reproduction, high detail hair and skin, linkedin profile quality, shot on Nikon Z9 portrait lens",
+    "corporate linkedin portrait, formal business attire, warm office lighting, realistic face detail, clean luxury office environment, premium professional headshot, ultra realistic",
 
-    "photorealistic half-body corporate portrait of the same person from reference images, deep navy wool suit, realistic office interior environment, warm cinematic tungsten-balanced lighting, ultra realistic skin and fabric texture, strong professional presence, premium business photography aesthetic",
+    "executive business portrait, black tailored suit, sophisticated office background, soft natural lighting, shallow depth of field, high-end corporate photography, realistic skin texture",
   ],
 
   startup: [
-    "photorealistic startup founder portrait of the same person from reference images, modern industrial coworking space background with soft bokeh, smart casual outfit — open collar shirt and unstructured blazer, relaxed and confident expression, natural ambient window lighting, true-to-life facial features preserved, premium editorial portrait quality",
+    "professional tech startup headshot, black blazer over dark t-shirt, modern startup office background, soft natural lighting, realistic skin texture, premium linkedin profile photo, ultra realistic",
 
-    "photorealistic tech entrepreneur headshot of the same person from reference images, modern startup loft office environment, casual dark blazer over crew-neck tee, warm natural lighting, authentic candid-style portrait, realistic skin texture and hair detail, approachable founder energy, shot on 85mm f/1.2",
+    "startup founder portrait, smart casual outfit, modern coworking space background, clean ambient lighting, realistic facial features, shallow depth of field, professional photography",
 
-    "photorealistic creative professional portrait of the same person from reference images, minimalist white concrete workspace background, soft natural daylight from window, business casual attire, genuine relaxed expression, ultra realistic face reproduction with pore detail, shallow depth of field, clean premium headshot aesthetic",
+    "tech entrepreneur headshot, modern business casual outfit, futuristic office background, soft daylight lighting, realistic skin texture, linkedin ready portrait, ultra realistic",
 
-    "photorealistic modern tech professional portrait of the same person from reference images, stylish business casual — navy chinos and fitted blazer, glass and steel startup office environment, cinematic shallow depth of field, realistic skin texture and natural hair, confident relaxed expression, editorial portrait quality",
+    "creative startup professional portrait, dark casual blazer, modern glass office environment, warm natural lighting, realistic face detail, premium business photography",
 
-    "photorealistic linkedin portrait of the same person from reference images, modern light-filled glass office background, natural true-to-life photography, genuine warm smile, casual professional attire, premium sharpness on face with soft bokeh background, startup founder aesthetic, shot on Sony 85mm GM lens",
+    "modern tech professional headshot, black t-shirt with fitted blazer, minimal startup office background, soft cinematic lighting, realistic portrait photography, linkedin style",
 
-    "photorealistic creative entrepreneur portrait of the same person from reference images, standing full-confidence pose, modern open coworking office environment, ultra sharp face and hair detail, realistic skin tones, soft ambient lighting, business casual styling, premium portrait photography with cinematic color grade",
+    "startup linkedin portrait, smart casual professional look, clean tech office background, shallow depth of field, realistic facial details, premium AI headshot photography",
   ],
 
   executive: [
-    "photorealistic luxury executive portrait of the same person from reference images, premium dark walnut and glass office background, formal black wool business suit with silk tie, ultra realistic face and skin preserved, powerful confident CEO expression, dramatic soft studio lighting, premium linkedin headshot quality, shot on Hasselblad medium format",
+    "luxury executive headshot, premium black business suit, elegant office background, soft studio lighting, realistic skin texture, powerful professional expression, ultra realistic corporate portrait",
 
-    "photorealistic senior executive headshot of the same person from reference images, elegant high-end corporate office interior, professional three-point studio lighting setup, ultra realistic skin texture and facial structure preserved, sharp eyes with natural catchlight, dark navy power suit, premium portrait photography",
+    "CEO portrait, dark charcoal suit and tie, luxury corporate office interior, cinematic soft lighting, realistic facial details, premium executive photography, linkedin profile style",
 
-    "photorealistic boardroom executive portrait of the same person from reference images, luxury conference room environment with soft background bokeh, formal dark business attire, cinematic warm-cool office lighting contrast, natural realistic face with full micro-detail, authoritative calm expression, magazine cover quality photography",
+    "executive leadership headshot, formal navy business suit, high-end office background, natural lighting, shallow depth of field, realistic portrait photography",
 
-    "photorealistic CEO linkedin portrait of the same person from reference images, luxury executive office background with bookshelves and city view, dark charcoal tailored suit, natural confident composed expression, ultra realistic photography preserving all facial features, premium business photography, shot on 85mm f/1.4",
+    "boardroom executive portrait, formal luxury attire, modern conference room background, soft dramatic lighting, ultra realistic skin texture, premium corporate photography",
 
-    "photorealistic executive leadership portrait of the same person from reference images, seated in modern leather boardroom chair, realistic corporate interior environment, soft dramatic side lighting with gentle fill, premium business aesthetic, true-to-life face and expression, sharp suit detail, editorial quality",
+    "professional executive linkedin portrait, black tailored suit, sophisticated office environment, realistic face detail, cinematic business lighting, ultra realistic",
 
-    "photorealistic distinguished executive portrait of the same person from reference images, high-end mahogany and glass office environment, realistic facial bone structure and skin texture fully preserved, ultra detailed hair and fabric, professional formal attire, powerful composed expression, premium magazine-quality corporate photography, Leica portrait rendering aesthetic",
+    "luxury business portrait, premium formal attire, elegant glass office background, warm soft lighting, realistic portrait photography, high-end executive headshot",
   ],
 };
 
