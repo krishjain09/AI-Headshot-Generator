@@ -7,4 +7,5 @@ generated/*
 !generated/.gitkeep
 .next/
 dist/
-*.log
+*.log/
+public/
